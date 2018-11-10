@@ -1,0 +1,38 @@
+version: "3.6"
+  dev-btcwallet:
+    build: ./wallet
+    container_name: dev-btcwallet
+    ports:
+      - "18554:18554"
+    expose:
+      - 18554
+    environment:
+      RPCUSER: admin
+      RPCPASS: p455w0rd!
+      WALLETACCOUNT: dev
+    volumes:
+      - ~/.btcwallet:/root/.btcwallet
+    networks:
+      - btcd
+  dev-btcd:
+    build: ./btcd
+    container_name: dev-btcd
+    ports:
+      - "18556:18556"
+      - "18555:18555"
+    expose:
+      - 18556
+      - 18555
+    environment:
+      RPCUSER: admin
+      RPCPASS: p455w0rd!
+      WALLETACCOUNT: dev
+    volumes:
+      - ~/.btcd:/root/.btcd
+    depends_on:
+      - dev-btcwallet
+    networks:
+      - btcd
+networks:
+  btcd:
+    driver: "bridge"
