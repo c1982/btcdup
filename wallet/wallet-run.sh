@@ -1,6 +1,7 @@
 #!/bin/bash
 
 set -e
+set -o verbose
 
 echo "RPC USER: ${RPCUSER}"
 echo "RPC PASS: ${RCPPASS}"
@@ -20,8 +21,8 @@ rpcconnect=btcd.local:18556" > /root/.btcwallet/btcwallet.conf
 fi
 
 if [ ! -f "/root/.btcwallet/rpc.cert" ]; then
-    gencerts --host="*" --org="dev" --directory="/root/.btcwallet" -y 10 -f
+    /root/gencerts --host="*" --org="dev" --directory="/root/.btcwallet" -y 10 -f
     echo "created certificate"
 fi
 
-btcwallet --simnet -u ${RPCUSER} -P ${RCPPASS} -d trace --createtemp --appdata=/root/.btcwallet -C /root/.btcwallet/btcwallet.conf
+/root/btcwallet --simnet -u ${RPCUSER} -P ${RCPPASS} -d trace --createtemp --appdata=/root/.btcwallet -C /root/.btcwallet/btcwallet.conf

@@ -26,8 +26,8 @@ ENV RCPPASS password
 
 EXPOSE 18554
 
-COPY --from=builder /go/bin/btcwallet /bin/
-COPY --from=builder /go/bin/gencerts /bin/
+COPY --from=builder /go/bin/btcwallet /root
+COPY --from=builder /go/bin/gencerts /root
 
 RUN apk --no-cache add \
 bash \
