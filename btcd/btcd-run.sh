@@ -5,7 +5,7 @@ set -o verbose
 
 WALLETHOST="wallet.local"
 
-sleep 7
+sleep 4
 
 if [ ! -d "/root/.btcwallet" ]; then
     mkdir /root/.btcwallet
@@ -45,12 +45,12 @@ echo "RPC USER: ${RPCUSER}"
 echo "RPC PASS: ${RCPPASS}"
 echo "ACCOUNT: ${WALLETACCOUNT}"
 
-/root/btcctl -s ${WALLETHOST} --skipverify -c /root/.btcd/rpc.cert -u ${RPCUSER} -P ${RCPPASS} --simnet --wallet walletpassphrase password 9999999
-echo "wallet unlocked"
-
 ACCEXISTS=$(/root/btcctl -s ${WALLETHOST} --skipverify -c /root/.btcd/rpc.cert -u ${RPCUSER} -P ${RCPPASS} --simnet --wallet listaccounts)
 echo "listaccounts result:"
 echo  ${ACCEXISTS}
+
+/root/btcctl -s ${WALLETHOST} --skipverify -c /root/.btcd/rpc.cert -u ${RPCUSER} -P ${RCPPASS} --simnet --wallet walletpassphrase password 9999999
+echo "wallet unlocked"
 
 if [[ ! $ACCEXISTS = *"${WALLETACCOUNT}"* ]]; then
    /root/btcctl -s ${WALLETHOST} --skipverify -c /root/.btcd/rpc.cert -u ${RPCUSER} -P ${RCPPASS} --simnet --wallet createnewaccount ${WALLETACCOUNT}
@@ -62,4 +62,4 @@ sleep 2
 MADDR=$(/root/btcctl -s ${WALLETHOST} --skipverify -c /root/.btcd/rpc.cert -u ${RPCUSER} -P ${RCPPASS} --simnet --wallet getnewaddress ${WALLETACCOUNT})
 echo "mining address for btcd: ${MADDR}"
 
-/root/btcd -d trace --simnet --miningaddr="${MADDR}"
+/root/btcd -d trace --simnet --miningaddr="${MADDR}" --rpclisten=0.0.0.0 --listen=0.0.0.0
