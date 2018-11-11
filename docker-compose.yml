@@ -1,7 +1,15 @@
 version: "3.6"
+networks:
+  btcd:
+    driver: "bridge"
+    ipam:
+      config:
+        - subnet: 172.23.0.0/16
+services:
   dev-btcwallet:
     build: ./wallet
     container_name: dev-btcwallet
+    hostname: wallet.local
     ports:
       - "18554:18554"
     expose:
@@ -11,12 +19,16 @@ version: "3.6"
       RPCPASS: p455w0rd!
       WALLETACCOUNT: dev
     volumes:
-      - ~/.btcwallet:/root/.btcwallet
+      - ~/.btcd:/root/.btcwallet
     networks:
-      - btcd
+      btcd:
+        ipv4_address: 172.23.0.2
+    extra_hosts:
+       - "btcd.local:172.23.0.3"
   dev-btcd:
     build: ./btcd
     container_name: dev-btcd
+    hostname: btcd.local
     ports:
       - "18556:18556"
       - "18555:18555"
@@ -26,13 +38,12 @@ version: "3.6"
     environment:
       RPCUSER: admin
       RPCPASS: p455w0rd!
-      WALLETACCOUNT: dev
     volumes:
       - ~/.btcd:/root/.btcd
     depends_on:
       - dev-btcwallet
     networks:
-      - btcd
-networks:
-  btcd:
-    driver: "bridge"
+      btcd:
+        ipv4_address: 172.23.0.3
+    extra_hosts:
+       - "wallet.local:172.23.0.2"

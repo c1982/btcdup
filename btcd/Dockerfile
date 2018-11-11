@@ -1,4 +1,4 @@
-FROM golang:1.10-alpine as builder
+FROM golang:1.11.2-alpine as builder
 
 RUN apk add --no-cache \
     git \
@@ -12,7 +12,7 @@ RUN git clone https://github.com/btcsuite/btcd . \
 
 FROM iron/base as final
 
-LABEL author=oğuzhan
+LABEL author=Oğuzhan
 LABEL email=aspsrc@gmail.com
 
 ENV RPCUSER admin
@@ -35,9 +35,11 @@ ca-certificates \
 && update-ca-certificates
 
 RUN mkdir /root/.btcd
+RUN mkdir /root/.btcwallet
 RUN mkdir /root/.btcctl
-COPY btcd-run.sh /root
-COPY btcd.conf /root/.btcd
+ADD btcd-run.sh /root
+
+RUN chmod +x /root/btcd-run.sh
 
 WORKDIR /root
 ENTRYPOINT ["/root/btcd-run.sh"]

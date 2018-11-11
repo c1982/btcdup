@@ -1,23 +1,28 @@
-FROM golang:1.10-alpine as builder
+FROM golang:1.11.2-alpine as builder
 
 RUN apk add --no-cache \
     git \
 &&  go get -u github.com/Masterminds/glide
 
+WORKDIR $GOPATH/src/github.com/btcsuite/btcd
+
+RUN git clone https://github.com/btcsuite/btcd . \
+&&  glide install \
+&&  go install . ./cmd/...
+
 WORKDIR $GOPATH/src/github.com/btcsuite/btcwallet
 
-RUN git clone clone https://github.com/btcsuite/btcwallet . \
+RUN git clone https://github.com/btcsuite/btcwallet . \
 &&  glide install \
 &&  go install . ./cmd/...
 
 FROM iron/base as final
 
-LABEL author=oğuzhan
+LABEL author=Oğuzhan
 LABEL email=aspsrc@gmail.com
 
 ENV RPCUSER admin
 ENV RCPPASS password
-ENV WALLET_ACCOUNT dev
 
 EXPOSE 18554
 
@@ -31,9 +36,8 @@ ca-certificates \
 && update-ca-certificates
 
 RUN mkdir /root/.btcwallet
-RUN mkdir /root/.btcwallet
-COPY wallet-run.sh /root
-COPY btcwallet.conf /root/.btcwallet
+ADD wallet-run.sh /root
+RUN chmod +x /root/wallet-run.sh
 
 WORKDIR /root
 ENTRYPOINT ["/root/wallet-run.sh"]
